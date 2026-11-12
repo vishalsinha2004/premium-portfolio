@@ -36,7 +36,7 @@ const Experience = () => {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section ref={containerRef} className="py-32 px-6 md:px-24 bg-obsidian relative">
+    <section ref={containerRef} className="py-32 px-6 md:px-24 relative">
       <motion.h2 
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}

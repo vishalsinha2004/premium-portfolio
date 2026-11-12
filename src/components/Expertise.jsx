@@ -24,7 +24,7 @@ const Expertise = () => {
   };
 
   return (
-    <section className="min-h-screen bg-obsidian py-32 px-6 md:px-24 flex flex-col justify-center relative overflow-hidden">
+    <section className="min-h-screen py-32 px-6 md:px-24 flex flex-col justify-center relative overflow-hidden">
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-mutedTeal/5 rounded-full blur-[150px] pointer-events-none" />
 

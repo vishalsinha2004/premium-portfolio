@@ -76,7 +76,7 @@ const TiltCard = ({ project, index }) => {
 
 const Projects = () => {
   return (
-    <section className="min-h-screen bg-obsidian py-32 px-6 md:px-24 perspective-1000">
+    <section className="min-h-screen py-32 px-6 md:px-24 perspective-1000">
       <motion.h2 
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}

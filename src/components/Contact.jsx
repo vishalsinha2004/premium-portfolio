@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const Contact = () => {
   return (
-    <section className="relative py-40 px-6 md:px-24 bg-obsidian flex flex-col items-center justify-center text-center overflow-hidden">
+    <section className="relative py-40 px-6 md:px-24  flex flex-col items-center justify-center text-center overflow-hidden">
       {/* Heavy graphic animated background for the footer */}
       <motion.div 
         animate={{ rotate: 360 }}
