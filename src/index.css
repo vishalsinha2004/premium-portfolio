@@ -17,3 +17,26 @@ canvas {
   outline: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0C10; /* obsidian */
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1F2833; /* charcoal */
+  border-radius: 10px;
+  border: 2px solid #0B0C10;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #45A29E; /* mutedTeal */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #66FCF1; /* cyanAccent */
+}

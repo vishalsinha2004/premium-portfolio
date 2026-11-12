@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 
 const skills = [
-  { category: "Frontend Core", tech: "React, JavaScript, Tailwind CSS, Vite" },
-  { category: "Backend & Auth", tech: "Node.js, Express, Django, Supabase" },
-  { category: "Database & Cloud", tech: "MongoDB, PostgreSQL, Render, Netlify" },
-  { category: "AI & Machine Learning", tech: "Python, LangChain, Gemini API, MediaPipe" },
-  { category: "Computer Vision", tech: "OpenCV, DeepFace (VGG-Face)" },
-  { category: "Architecture", tech: "System Design, RAG Integration, WebSockets" }
+  { category: "Frontend Core", tech: "React.js, JavaScript, Tailwind CSS, Vite" },
+  { category: "Backend Architecture", tech: "Python, Django, Node.js, Express" },
+  { category: "AI & Machine Learning", tech: "Gemini API, Groq, LangChain, OpenCV, MediaPipe" },
+  { category: "Database & Auth", tech: "PostgreSQL, MongoDB, Supabase, Brevo API" },
+  { category: "Deployment & DevOps", tech: "Render, Netlify, Gunicorn, Nginx, GitHub Actions" },
+  { category: "System Design", tech: "RAG Integration, REST APIs, WebSockets" }
 ];
 
 const Expertise = () => {
@@ -24,7 +24,7 @@ const Expertise = () => {
   };
 
   return (
-    <section className="min-h-screen bg-obsidian py-24 px-6 md:px-24 flex flex-col justify-center relative overflow-hidden">
+    <section className="min-h-screen bg-obsidian py-32 px-6 md:px-24 flex flex-col justify-center relative overflow-hidden">
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-mutedTeal/5 rounded-full blur-[150px] pointer-events-none" />
 
@@ -32,7 +32,7 @@ const Expertise = () => {
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        className="text-4xl md:text-6xl font-extrabold text-white mb-16 relative z-10"
+        className="text-4xl md:text-6xl font-black text-white mb-20 relative z-10 tracking-tighter"
       >
         Technical <span className="text-cyanAccent">Arsenal.</span>
       </motion.h2>
@@ -48,10 +48,10 @@ const Expertise = () => {
           <motion.div 
             key={index}
             variants={item}
-            whileHover={{ scale: 1.03, backgroundColor: "rgba(31, 40, 51, 0.8)" }}
-            className="p-8 rounded-3xl bg-charcoal/40 backdrop-blur-md border border-white/5 shadow-lg transition-colors group cursor-none"
+            whileHover={{ scale: 1.05, y: -10, backgroundColor: "rgba(31, 40, 51, 0.8)" }}
+            className="p-8 rounded-3xl bg-charcoal/30 backdrop-blur-xl border border-white/5 shadow-lg transition-all group cursor-none"
           >
-            <h3 className="text-xl font-bold text-gray-300 mb-2 group-hover:text-white transition-colors">
+            <h3 className="text-xl font-bold text-gray-300 mb-4 group-hover:text-white transition-colors">
               {skill.category}
             </h3>
             <p className="text-cyanAccent font-mono text-sm leading-relaxed">

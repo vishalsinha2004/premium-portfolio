@@ -1,7 +1,10 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Preloader from './components/Preloader';
+import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
+import Experience from './components/Experience';
 import Expertise from './components/Expertise';
 import Contact from './components/Contact';
 import CustomCursor from './components/CustomCursor';
@@ -19,16 +22,30 @@ function App() {
 
   return (
     <div ref={containerRef} className="bg-obsidian w-full min-h-dvh font-sans selection:bg-cyanAccent selection:text-obsidian text-white cursor-none">
+      {/* Global Overlays */}
+      <Preloader />
       <CustomCursor />
+      <Navbar />
       
-      <motion.div style={{ y: heroParallaxY, opacity: heroOpacity }} className="relative z-0">
+      {/* Home Section */}
+      <motion.div id="home" style={{ y: heroParallaxY, opacity: heroOpacity }} className="relative z-0">
         <Hero />
       </motion.div>
 
+      {/* Main Content Layers */}
       <div className="relative z-10 bg-obsidian rounded-t-[40px] shadow-[0_-20px_50px_rgba(11,12,16,1)] -mt-20">
-        <Projects />
-        <Expertise />
-        <Contact />
+        <div id="projects">
+          <Projects />
+        </div>
+        <div id="experience">
+          <Experience />
+        </div>
+        <div id="expertise">
+          <Expertise />
+        </div>
+        <div id="contact">
+          <Contact />
+        </div>
       </div>
     </div>
   );
