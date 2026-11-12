@@ -1,5 +1,14 @@
 import { motion } from 'framer-motion';
+// 1. Import extend from fiber
+import { Canvas, extend } from '@react-three/fiber'; 
+import { OrbitControls, Environment } from '@react-three/drei';
+// 2. Import THREE
+import * as THREE from 'three'; 
 import { portfolioData } from '../data/portfolioData';
+import InteractiveModel from './InteractiveModel';
+
+// 3. Extend the THREE namespace immediately before the component loads
+extend(THREE);
 
 const Hero = () => {
   const containerVariants = {
@@ -22,18 +31,27 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-dvh flex items-center justify-center bg-obsidian overflow-hidden px-6">
-      {/* Animated Background Graphic Elements */}
-      <motion.div 
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyanAccent/10 rounded-full blur-[120px] pointer-events-none"
-      />
+      {/* 3D Canvas Background layer (Optimized for Mobile) */}
+      <div className="absolute inset-0 z-0 cursor-move">
+        <Canvas 
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          dpr={[1, 2]} 
+          performance={{ min: 0.5 }}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={1.5} />
+          <InteractiveModel />
+          <Environment preset="city" />
+          <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
+        </Canvas>
+      </div>
       
+      {/* Animated 2D Glassmorphic UI Layer */}
       <motion.div 
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 max-w-5xl w-full backdrop-blur-md bg-charcoal/30 border border-white/10 p-10 md:p-16 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+        className="relative z-10 max-w-5xl w-full backdrop-blur-md bg-charcoal/30 border border-white/10 p-10 md:p-16 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] pointer-events-auto"
       >
         <motion.p variants={itemVariants} className="text-mutedTeal font-mono text-lg mb-4">
           {portfolioData.hero.greeting}

@@ -1,14 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
   background-color: #0B0C10;
-  /* Ensure smooth scrolling behavior across the site */
-  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Hide default cursor on desktop to prioritize the custom Framer Motion cursor */
