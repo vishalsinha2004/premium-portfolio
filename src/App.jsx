@@ -1,59 +1,43 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import Preloader from './components/Preloader';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
+import { ReactLenis } from 'lenis/react';
+import 'lenis/dist/lenis.css';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
-import Expertise from './components/Expertise';
-import Contact from './components/Contact';
+import Footer from './components/Footer';
+import Preloader from './components/Preloader';
 import CustomCursor from './components/CustomCursor';
-import Background3D from './components/Background3D';
-import About from './components/About';
 
 function App() {
-  const containerRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const heroParallaxY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-
   return (
-    <div ref={containerRef} className="bg-transparent w-full min-h-dvh font-sans selection:bg-cyanAccent selection:text-obsidian text-white cursor-none">
-      {/* Global Overlays & 3D Environment */}
-      <Preloader />
-      <Background3D />
-      <CustomCursor />
-      <Navbar />
+    <ReactLenis root options={{ lerp: 0.05, duration: 1.5, smoothTouch: false }}>
+      {/* Added cursor-none to hide default pointer */}
+      <main className="w-full min-h-screen-safe bg-background selection:bg-accent selection:text-white cursor-none">
+        
+        <Preloader />
+        <CustomCursor />
+        
+        <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference text-white pointer-events-none">
+          <span className="font-bold tracking-tighter text-xl pointer-events-auto">VS.</span>
+          <a href="/resume.pdf" download className="text-sm font-medium border border-white/20 rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors pointer-events-auto">
+            Download CV
+          </a>
+        </nav>
 
-      {/* Home Section */}
-      <motion.div id="home" style={{ y: heroParallaxY, opacity: heroOpacity }} className="relative z-0">
-        <Hero />
-      </motion.div>
+        <section className="min-h-screen-safe flex flex-col items-center justify-center px-6">
+          <h1 className="text-6xl md:text-[9vw] font-black tracking-tighter leading-[0.9] text-center mb-6">
+            Architecting <br/> 
+            <span className="text-secondary">Digital Space.</span>
+          </h1>
+          <p className="text-primary font-medium text-lg md:text-xl max-w-2xl text-center">
+            Full-stack engineer specializing in Python, React, and intelligent AI integrations.
+          </p>
+        </section>
 
-      {/* Main Content Layers - Using transparent backgrounds to show the 3D particles */}
-      <div className="relative z-10 bg-obsidian/80 backdrop-blur-sm rounded-t-[40px] shadow-[0_-20px_50px_rgba(11,12,16,1)] -mt-20">
-        <div id="about">
-          <About />
-        </div>
-        <div id="projects">
-          <Projects />
-        </div>
-        <div id="experience">
-          <Experience />
-        </div>
-        <div id="expertise">
-          <Expertise />
-        </div>
-        <div id="contact">
-          <Contact />
-        </div>
-      </div>
-    </div>
+        <Projects />
+        <Experience />
+        <Footer />
+
+      </main>
+    </ReactLenis>
   );
 }
 

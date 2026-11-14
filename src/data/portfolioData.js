@@ -1,42 +1,38 @@
+// src/data/portfolioData.js
+
 export const portfolioData = {
-  hero: {
-    greeting: "Hello, I'm",
-    name: "Vishal Sinha",
-    role: "Full-Stack & AI Developer",
-    tagline: "Architecting intelligent web platforms and heavy graphic experiences using React, Django, and Gemini.",
-  },
   projects: [
     {
       id: 1,
-      title: "Walkvert & Indora",
-      tech: ["React", "Node.js", "Tailwind CSS"],
-      description: "A multi-modal transportation aggregator and logistics advertising platform engineered for urban transit.",
-      github: "#",
-      live: "#",
+      title: "Parceel (P-Pilot)",
+      description: "An on-demand driver and delivery partner application featuring real-time geographic routing and dynamic status toggling.",
+      tech: ["React.js", "Django", "Leaflet", "OpenStreetMap"],
+      github: "https://github.com/vishalsinha2004", // Replace with actual repo if public
+      liveUrl: "https://parceel.onrender.com"
     },
     {
       id: 2,
-      title: "Notesroom",
-      tech: ["Django", "React", "Supabase"],
-      description: "Academic note-sharing web platform featuring secure OTP authentication and robust S3 document storage.",
-      github: "#",
-      live: "#",
+      title: "Walkvert",
+      description: "An outdoor advertising campaign analytics platform providing deep metric visualization and data tracking.",
+      tech: ["Django REST", "React.js", "PostgreSQL", "Tailwind CSS"],
+      github: "https://github.com/vishalsinha2004",
+      liveUrl: "https://walkvert.netlify.app"
     },
     {
       id: 3,
-      title: "MyPDF.AI",
-      tech: ["Python", "Streamlit", "Gemini API", "FAISS"],
-      description: "Intelligent RAG-based document chatbot utilizing vector embeddings for precise PDF parsing.",
-      github: "#",
-      live: "#",
+      title: "Notesroom",
+      description: "A full-stack academic note-sharing ecosystem with Brevo OTP email verification and secure cloud storage.",
+      tech: ["React.js", "Django", "Supabase S3", "Brevo API"],
+      github: "https://github.com/vishalsinha2004",
+      liveUrl: "https://notes-room.netlify.app"
     },
     {
       id: 4,
-      title: "MarkAI",
-      tech: ["Python", "OpenCV", "MediaPipe"],
-      description: "Intelligent desktop voice assistant integrating speech recognition and computer vision.",
-      github: "#",
-      live: "#",
+      title: "MyPDF.AI",
+      description: "An interactive RAG-based document query system allowing users to chat directly with their PDF files via vector embeddings.",
+      tech: ["Python", "Streamlit", "Gemini API", "FAISS"],
+      github: "https://github.com/vishalsinha2004",
+      liveUrl: "#"
     }
   ]
 };

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import profileImg from '../assets/hero.png';
 
 const About = () => {
   return (
@@ -15,7 +16,7 @@ const About = () => {
           <div className="w-full h-full rounded-full bg-charcoal overflow-hidden border-4 border-obsidian">
             {/* Replace this div with an actual <img> tag pointing to your profile picture in src/assets/ */}
             <div className="w-full h-full bg-obsidian/50 flex items-center justify-center text-cyanAccent font-mono text-sm">
-              [Insert Profile Image]
+              <img src={profileImg} alt="Vishal Sinha" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
