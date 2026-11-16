@@ -1,9 +1,5 @@
-import { Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, Loader } from '@react-three/drei';
 import { portfolioData } from '../data/portfolioData';
-import InteractiveModel from './InteractiveModel';
 
 const Hero = () => {
   const containerVariants = {
@@ -15,76 +11,78 @@ const Hero = () => {
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0, filter: 'blur(10px)' },
+    hidden: { y: 40, opacity: 0, filter: 'blur(15px)' },
     visible: {
       y: 0,
       opacity: 1,
       filter: 'blur(0px)',
-      transition: { type: 'spring', stiffness: 100, damping: 10 }
+      transition: { type: 'spring', stiffness: 80, damping: 12 }
     }
   };
 
   return (
-    <>
-      <section className="relative min-h-dvh flex items-center justify-center bg-obsidian overflow-hidden px-6">
-        {/* 3D Canvas with Suspense Wrapping */}
-        <div className="absolute inset-0 z-0 cursor-move">
-          <Canvas
-            camera={{ position: [0, 0, 5], fov: 45 }}
-            dpr={[1, 2]}
-            performance={{ min: 0.5 }}
-          >
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[10, 10, 5]} intensity={1.5} />
-
-            {/* Suspense prevents the app from crashing while the 3D assets load */}
-            <Suspense fallback={null}>
-              <InteractiveModel />
-              <Environment preset="city" />
-            </Suspense>
-
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-          </Canvas>
-        </div>
-
-        {/* Animated 2D Glassmorphic UI Layer */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative z-10 max-w-5xl w-full backdrop-blur-md bg-charcoal/30 border border-white/10 p-10 md:p-16 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] pointer-events-auto"
-        >
-          <motion.p variants={itemVariants} className="text-mutedTeal font-mono text-lg mb-4">
-            {portfolioData.hero.greeting}
-          </motion.p>
-          <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight">
-            {portfolioData.hero.name}.
-          </motion.h1>
-          <motion.h2 variants={itemVariants} className="text-4xl md:text-6xl font-bold text-gray-400 mb-8">
-            {portfolioData.hero.role}.
-          </motion.h2>
-          <motion.p variants={itemVariants} className="text-gray-300 max-w-2xl text-lg leading-relaxed mb-10">
-            {portfolioData.hero.tagline}
-          </motion.p>
-
-          <motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0px 0px 20px rgba(102, 252, 241, 0.4)" }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-transparent border-2 border-cyanAccent text-cyanAccent rounded-lg font-bold tracking-wide transition-colors hover:bg-cyanAccent hover:text-obsidian"
-          >
-            View Projects
-          </motion.button>
-        </motion.div>
-      </section>
-
-      {/* Global Preloader Overlay */}
-      <Loader
-        containerStyles={{ backgroundColor: '#0B0C10' }}
-        innerStyles={{ backgroundColor: '#1F2833', width: '300px' }}
-        barStyles={{ backgroundColor: '#66FCF1' }}
-        dataInterpolation={(p) => `Loading Engine ${p.toFixed(0)}%`}
+    <section className="relative min-h-dvh flex items-center justify-center overflow-hidden px-6 bg-transparent">
+      
+      {/* POWERFUL DESIGNER ADDITION: Animated Ambient Auroras */}
+      {/* These float slowly behind the card to create massive energy without clutter */}
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+          rotate: [0, 90, 0]
+        }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/2 left-1/3 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#66FCF1] rounded-full mix-blend-screen filter blur-[120px] md:blur-[150px] opacity-40 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
       />
-    </>
+      
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.4, 1],
+          opacity: [0.2, 0.4, 0.2],
+          rotate: [0, -90, 0]
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/3 right-1/4 w-[250px] md:w-[450px] h-[250px] md:h-[450px] bg-[#45A29E] rounded-full mix-blend-screen filter blur-[100px] md:blur-[130px] opacity-30 z-0 pointer-events-none"
+      />
+
+      {/* Upgraded Ultra-Premium Glassmorphic Card */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 max-w-5xl w-full backdrop-blur-2xl bg-[#0B0C10]/40 border border-white/10 p-10 md:p-20 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden group"
+      >
+        {/* Inner corner glow for depth */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#66FCF1]/20 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#66FCF1]/30 transition-colors duration-1000" />
+        <div className="absolute inset-0 border border-white/5 rounded-[3rem] pointer-events-none" />
+
+        <motion.p variants={itemVariants} className="text-[#66FCF1] font-mono text-sm md:text-base tracking-widest uppercase mb-6">
+          {portfolioData.hero.greeting}
+        </motion.p>
+        
+        {/* Upgraded Typography: Metallic Text Gradient */}
+        <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl lg:text-[7rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-600 mb-4 tracking-tighter leading-none">
+          {portfolioData.hero.name}.
+        </motion.h1>
+        
+        <motion.h2 variants={itemVariants} className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-gray-400 mb-10 tracking-tight">
+          {portfolioData.hero.role}.
+        </motion.h2>
+        
+        <motion.p variants={itemVariants} className="text-gray-300 max-w-2xl text-lg md:text-2xl leading-relaxed mb-12 font-medium">
+          {portfolioData.hero.tagline}
+        </motion.p>
+
+        {/* Upgraded Button Architecture */}
+        <motion.button
+          whileHover={{ scale: 1.02, boxShadow: "0px 0px 30px rgba(102, 252, 241, 0.4)" }}
+          whileTap={{ scale: 0.98 }}
+          className="px-10 py-5 bg-transparent border-2 border-[#66FCF1] text-[#66FCF1] rounded-xl font-bold tracking-widest uppercase transition-all hover:bg-[#66FCF1] hover:text-[#0B0C10] cursor-none relative overflow-hidden"
+        >
+          View Projects
+        </motion.button>
+      </motion.div>
+    </section>
   );
 };
 
