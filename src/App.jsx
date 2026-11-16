@@ -1,39 +1,59 @@
 import { ReactLenis } from 'lenis/react';
 import 'lenis/dist/lenis.css';
-import Projects from './components/Projects';
-import Experience from './components/Experience';
-import Footer from './components/Footer';
+
+// 1. Import all of your animated components
 import Preloader from './components/Preloader';
 import CustomCursor from './components/CustomCursor';
+import Navbar from './components/Navbar';
+
+// 2. Import your Page Sections (Make sure your file names match these imports)
+import Hero from './components/Hero'; 
+import About from './components/About';
+import Projects from './components/Projects';
+import Experience from './components/Experience';
+import Expertise from './components/Expertise';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <ReactLenis root options={{ lerp: 0.05, duration: 1.5, smoothTouch: false }}>
-      {/* Added cursor-none to hide default pointer */}
-      <main className="w-full min-h-screen-safe bg-background selection:bg-accent selection:text-white cursor-none">
+      {/* cursor-none hides the default pointer so your CustomCursor takes over */}
+      <main className="w-full min-h-screen-safe bg-[#0B0C10] selection:bg-[#66FCF1] selection:text-[#0B0C10] cursor-none relative">
         
+        {/* Global Overlays */}
         <Preloader />
         <CustomCursor />
         
-        <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference text-white pointer-events-none">
-          <span className="font-bold tracking-tighter text-xl pointer-events-auto">VS.</span>
-          <a href="/resume.pdf" download className="text-sm font-medium border border-white/20 rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors pointer-events-auto">
-            Download CV
-          </a>
-        </nav>
+        {/* The Animated Navigation Bar */}
+        <Navbar />
+        
+        {/* Page Sections with IDs matching your Navbar links */}
+        <div id="home">
+          <Hero />
+        </div>
+        
+        <div id="about">
+          <About />
+        </div>
 
-        <section className="min-h-screen-safe flex flex-col items-center justify-center px-6">
-          <h1 className="text-6xl md:text-[9vw] font-black tracking-tighter leading-[0.9] text-center mb-6">
-            Architecting <br/> 
-            <span className="text-secondary">Digital Space.</span>
-          </h1>
-          <p className="text-primary font-medium text-lg md:text-xl max-w-2xl text-center">
-            Full-stack engineer specializing in Python, React, and intelligent AI integrations.
-          </p>
-        </section>
+        <div id="projects">
+          <Projects />
+        </div>
 
-        <Projects />
-        <Experience />
+        <div id="expertise">
+          <Expertise />
+        </div>
+
+        <div id="experience">
+          <Experience />
+        </div>
+
+        <div id="contact">
+          <Contact />
+        </div>
+
+        {/* Global Footer */}
         <Footer />
 
       </main>

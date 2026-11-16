@@ -1,13 +1,17 @@
-// src/data/portfolioData.js
-
 export const portfolioData = {
+  hero: {
+    greeting: "INITIATING SEQUENCE...",
+    name: "Vishal Sinha",
+    role: "Full-Stack Engineer",
+    tagline: "Architecting intelligent web platforms and high-performance digital spaces."
+  },
   projects: [
     {
       id: 1,
       title: "Parceel (P-Pilot)",
       description: "An on-demand driver and delivery partner application featuring real-time geographic routing and dynamic status toggling.",
       tech: ["React.js", "Django", "Leaflet", "OpenStreetMap"],
-      github: "https://github.com/vishalsinha2004", // Replace with actual repo if public
+      github: "https://github.com/vishalsinha2004",
       liveUrl: "https://parceel.onrender.com"
     },
     {
