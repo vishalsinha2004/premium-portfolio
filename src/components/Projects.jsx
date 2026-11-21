@@ -1,87 +1,146 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../data/portfolioData';
+import GlitchText from './GlitchText';
 
-const ProjectCard = ({ project, index }) => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(useSpring(y, { damping: 20 }), [-0.5, 0.5], ["5deg", "-5deg"]);
-  const rotateY = useTransform(useSpring(x, { damping: 20 }), [-0.5, 0.5], ["-5deg", "5deg"]);
+const Projects = () => {
+  const [activeId, setActiveId] = useState(null);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ delay: index * 0.1 }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        x.set((e.clientX - rect.left) / rect.width - 0.5);
-        y.set((e.clientY - rect.top) / rect.height - 0.5);
-      }}
-      onMouseLeave={() => { x.set(0); y.set(0); }}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      className="relative p-10 rounded-[2.5rem] bg-[#1F2833]/40 backdrop-blur-xl border border-[#66FCF1]/20 shadow-xl group overflow-hidden cursor-none perspective-[1000px] flex flex-col justify-between min-h-[400px]"
-    >
-      <motion.div 
-        animate={{ x: ["-100%", "200%"] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }}
-        className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#66FCF1]/5 to-transparent skew-x-12 pointer-events-none"
-      />
-
-      <div style={{ transform: "translateZ(30px)" }}>
-        <div className="flex justify-between items-start mb-6">
-          <span className="font-mono text-[#66FCF1] text-sm border border-[#66FCF1]/30 px-3 py-1 rounded-full">
-            SYS.{project.id}
+    <section className="w-full bg-[#050505] text-[#F4F4F0] border-b border-white/10">
+      <div className="px-6 md:px-12 py-12 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="overflow-hidden">
+          <span className="font-mono text-xs uppercase tracking-widest text-[#FF2A2A] block mb-2">
+            (01) // MEM_INDEX_DEPLOYMENTS
           </span>
-          <div className="flex gap-3">
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#66FCF1] transition-colors cursor-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </a>
-            )}
-            {project.liveUrl !== "#" && (
-              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#66FCF1] transition-colors cursor-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </a>
-            )}
-          </div>
+          <motion.h2
+            initial={{ y: '100%' }}
+            whileInView={{ y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-none"
+          >
+            <GlitchText text="DEPLOYMENTS" auto />
+          </motion.h2>
         </div>
-
-        <h3 className="text-3xl font-bold text-white mb-4 tracking-tight group-hover:text-[#66FCF1] transition-colors">
-          {project.title}
-        </h3>
-        <p className="text-gray-400 font-medium leading-relaxed mb-8">
-          {project.description}
+        <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
+          Hover or tap row // Inspect fault log
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2" style={{ transform: "translateZ(40px)" }}>
-        {project.tech.map((t, idx) => (
-          <span key={idx} className="px-3 py-1 bg-[#0B0C10] border border-white/5 text-[#45A29E] text-xs font-mono rounded-md tracking-widest uppercase">
-            {t}
-          </span>
-        ))}
-      </div>
-    </motion.div>
-  );
-};
+      <div className="flex flex-col">
+        {portfolioData.projects.map((project, index) => {
+          const isOpen = activeId === project.id;
 
-const Projects = () => {
-  return (
-    <section className="py-32 px-6 md:px-24 max-w-[1600px] mx-auto bg-transparent relative z-10">
-      <motion.h2 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="text-4xl md:text-6xl font-black text-white mb-20 tracking-tighter"
-      >
-        Featured <span className="text-[#66FCF1]">Deployments.</span>
-      </motion.h2>
+          return (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              onMouseEnter={() => setActiveId(project.id)}
+              onMouseLeave={() => setActiveId(null)}
+              onClick={() => setActiveId(isOpen ? null : project.id)}
+              className="relative border-b border-white/10 cursor-pointer overflow-hidden"
+            >
+              {/* Curtain Fill */}
+              <motion.div
+                initial={false}
+                animate={{ y: isOpen ? '0%' : '100%' }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 bg-[#D4FF00] z-0 pointer-events-none"
+              />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-        {portfolioData.projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
-        ))}
+              {/* Red Tear Line on Active Row */}
+              {isOpen && (
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FF2A2A] z-20 pointer-events-none" />
+              )}
+
+              <div
+                className={`relative z-10 px-6 md:px-12 py-8 md:py-10 grid grid-cols-12 items-center gap-4 transition-colors duration-200 ${
+                  isOpen ? 'text-black' : 'text-[#F4F4F0]'
+                }`}
+              >
+                <span className={`col-span-2 md:col-span-1 font-mono text-xs ${isOpen ? 'text-[#FF2A2A] font-bold' : 'text-neutral-500'}`}>
+                  0x0{index + 1}
+                </span>
+
+                <motion.h3
+                  animate={{ x: isOpen ? 14 : 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                  className="col-span-10 md:col-span-6 text-3xl md:text-6xl font-black uppercase tracking-tighter"
+                >
+                  <GlitchText text={project.title} />
+                </motion.h3>
+
+                <div className="hidden md:flex col-span-4 flex-wrap gap-2">
+                  {project.tech.slice(0, 3).map((t, i) => (
+                    <span
+                      key={i}
+                      className={`px-3 py-1 text-xs font-mono uppercase tracking-wider border ${
+                        isOpen ? 'border-black/30 text-black' : 'border-white/15 text-neutral-400'
+                      }`}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <motion.div
+                  animate={{ rotate: isOpen ? -45 : 0 }}
+                  className="hidden md:flex col-span-1 justify-end text-2xl font-mono"
+                >
+                  →
+                </motion.div>
+              </div>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative z-10 overflow-hidden text-black"
+                  >
+                    <div className="px-6 md:px-12 pb-10 pt-4 grid grid-cols-1 md:grid-cols-12 gap-6 border-t border-black/15">
+                      <div className="md:col-start-2 md:col-span-6">
+                        <p className="text-base md:text-xl font-medium leading-relaxed text-black/85">
+                          {project.description}
+                        </p>
+                      </div>
+                      <div className="md:col-span-5 flex items-end md:justify-end gap-4 font-mono text-xs uppercase font-bold">
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="px-6 py-3 border border-black hover:bg-[#FF2A2A] hover:border-[#FF2A2A] hover:text-black transition-colors"
+                          >
+                            Source_Code ↗
+                          </a>
+                        )}
+                        {project.liveUrl && project.liveUrl !== '#' && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="px-6 py-3 bg-black text-[#D4FF00] hover:bg-[#FF2A2A] hover:text-black transition-colors"
+                          >
+                            Exec_Live ↗
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

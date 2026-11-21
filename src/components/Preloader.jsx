@@ -1,62 +1,73 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const BOOT_LOGS = [
+  'ERR_0x01 // DISPLAY_SYNC_LOST',
+  'BYPASSING KERNEL CHECKSUM...',
+  'MOUNTING ARCHITECTURE_GRID...',
+  'SIGNAL_LOCKED // 100%',
+];
+
 const Preloader = () => {
+  const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      document.body.style.overflow = 'auto'; 
-    }, 2500); // Slightly longer for the boot effect
-    
     document.body.style.overflow = 'hidden';
-    return () => clearTimeout(timer);
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            setIsLoading(false);
+            document.body.style.overflow = 'auto';
+          }, 260);
+          return 100;
+        }
+        return prev + 4;
+      });
+    }, 35);
+
+    return () => {
+      clearInterval(interval);
+      document.body.style.overflow = 'auto';
+    };
   }, []);
+
+  const isFaultPhase = progress < 40;
+  const logIndex = Math.min(BOOT_LOGS.length - 1, Math.floor(progress / 28));
 
   return (
     <AnimatePresence>
       {isLoading && (
         <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, filter: "blur(20px)", scale: 1.1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] bg-[#0B0C10] flex flex-col items-center justify-center px-6 overflow-hidden"
+          initial={{ y: 0 }}
+          exit={{ y: '-100%' }}
+          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          className="fixed inset-0 z-[100] bg-[#050505] text-[#F4F4F0] flex flex-col justify-between p-6 md:p-12 border-b border-white/10"
         >
-          {/* Cyber Scanning Line */}
-          <motion.div 
-            animate={{ y: ["-100vh", "100vh"] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="absolute top-0 left-0 w-full h-[2px] bg-[#66FCF1] shadow-[0_0_20px_#66FCF1] z-50 pointer-events-none opacity-50"
-          />
-
-          <div className="overflow-hidden relative z-10">
-            <motion.h1 
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-5xl md:text-8xl font-black tracking-tighter text-white"
-            >
-              Vishal Sinha<span className="text-[#66FCF1]">.</span>
-            </motion.h1>
+          <div className="flex justify-between font-mono text-xs uppercase tracking-widest">
+            <span className={isFaultPhase ? 'text-[#FF2A2A] animate-pulse' : 'text-neutral-500'}>
+              {isFaultPhase ? 'FAULT // RECOVERY_MODE' : 'Vishal Sinha — Portfolio'}
+            </span>
+            <span className="text-neutral-500">0x7FFF2A</span>
           </div>
-          
-          <div className="overflow-hidden mt-6 flex flex-col items-center gap-2 relative z-10">
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 0.5 }}
-              className="text-[#66FCF1] font-mono tracking-widest uppercase text-xs md:text-sm"
-            >
-              [ SYSTEM INITIALIZATION ]
-            </motion.p>
-            {/* Loading Bar */}
-            <div className="w-64 h-[2px] bg-white/10 mt-2 overflow-hidden relative">
-              <motion.div 
-                initial={{ x: "-100%" }}
-                animate={{ x: "0%" }}
-                transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
-                className="absolute top-0 left-0 h-full w-full bg-[#66FCF1]"
+
+          <div className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between gap-4">
+              <span
+                className={`font-mono text-xs uppercase tracking-widest ${
+                  isFaultPhase ? 'text-[#FF2A2A]' : 'text-[#D4FF00]'
+                }`}
+              >
+                {BOOT_LOGS[logIndex]}
+              </span>
+              <span
+                className={`text-6xl md:text-9xl font-black tracking-tighter leading-none tabular-nums ${ isFaultPhase ? 'text-[#FF2A2A]' : 'text-[#F4F4F0]' }`} > {String(progress).padStart(2, '0')}\% </span> </div>  <div className="w-full h-[2px] bg-white/10 overflow-hidden"> <div style={{ width: `${progress}%` }}
+                className={`h-full transition-all duration-75 ${
+                  isFaultPhase ? 'bg-[#FF2A2A]' : 'bg-[#D4FF00]'
+                }`}
               />
             </div>
           </div>

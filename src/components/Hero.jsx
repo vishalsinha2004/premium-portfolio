@@ -1,149 +1,314 @@
-import { useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { portfolioData } from '../data/portfolioData';
 
+const tickerItems = [
+  'FULL-STACK ARCHITECTURE',
+  'PYTHON & DJANGO REST',
+  'REACT & FRAMER MOTION',
+  'RAG & AI AUTOMATION',
+  'SCALABLE CLOUD SYSTEMS',
+];
+
+const GLITCH_CHARS = '01X#$%_/@&!?<>';
+const FAULT_CODES = [
+  '0x004F9A // FRAME_DROP',
+  'ERR_SYNC // SIGNAL_LOST',
+  'SIGSEGV // RECOVERING',
+  'MEM_FAULT // 0x7FFF2A',
+];
+
+const scrambleText = (original, intensity = 0.45) =>
+  original
+    .split('')
+    .map((char) =>
+      Math.random() < intensity
+        ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+        : char
+    )
+    .join('');
+
 const Hero = () => {
-  // 1. Setup dynamic mouse tracking for responsive animations
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const [time, setTime] = useState('');
+  const [glitchState, setGlitchState] = useState({
+    active: false,
+    first: 'VISHAL',
+    last: 'SINHA',
+    faultCode: FAULT_CODES[0],
+    sliceTop: 20,
+    sliceBottom: 55,
+    offsetX: 0,
+  });
 
-  // Smooth out the raw mouse data with spring physics for a heavy, premium feel
-  const springConfig = { damping: 25, stiffness: 150 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
 
-  // 2. Create parallax offsets for the background HUD rings
-  const ring1X = useTransform(smoothX, [-1, 1], [-40, 40]);
-  const ring1Y = useTransform(smoothY, [-1, 1], [-40, 40]);
-  
-  const ring2X = useTransform(smoothX, [-1, 1], [60, -60]);
-  const ring2Y = useTransform(smoothY, [-1, 1], [60, -60]);
+  const xLeft = useTransform(scrollYProgress, [0, 1], ['0%', '-12%']);
+  const xRight = useTransform(scrollYProgress, [0, 1], ['0%', '12%']);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.25]);
 
-  // 3. Create 3D magnetic tilt for the main UI card
-  const cardRotateX = useTransform(smoothY, [-1, 1], ["5deg", "-5deg"]);
-  const cardRotateY = useTransform(smoothX, [-1, 1], ["-5deg", "5deg"]);
-
-  // Listen for mouse movement across the entire screen
+  // Live IST clock
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      // Normalize mouse coordinates from -1 to 1
-      const normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
-      const normalizedY = (e.clientY / window.innerHeight) * 2 - 1;
-      mouseX.set(normalizedX);
-      mouseY.set(normalizedY);
+    const updateTime = () => {
+      setTime(
+        new Date().toLocaleTimeString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Realistic multi-frame glitch burst (scramble + slice tear + stutter)
+  const triggerGlitch = useCallback(() => {
+    const fault = FAULT_CODES[Math.floor(Math.random() * FAULT_CODES.length)];
+    let frame = 0;
+    const totalFrames = 4;
+
+    const runFrame = () => {
+      if (frame >= totalFrames) {
+        setGlitchState((prev) => ({
+          ...prev,
+          active: false,
+          first: 'VISHAL',
+          last: 'SINHA',
+          offsetX: 0,
+        }));
+        return;
+      }
+
+      const top = Math.floor(Math.random() * 55);
+      const height = 12 + Math.floor(Math.random() * 25);
+
+      setGlitchState({
+        active: true,
+        first: scrambleText('VISHAL', frame === 1 ? 0.65 : 0.35),
+        last: scrambleText('SINHA', frame === 2 ? 0.65 : 0.35),
+        faultCode: fault,
+        sliceTop: top,
+        sliceBottom: Math.max(0, 100 - (top + height)),
+        offsetX: (Math.random() > 0.5 ? 1 : -1) * (6 + Math.floor(Math.random() * 14)),
+      });
+
+      frame += 1;
+      setTimeout(runFrame, 45 + Math.random() * 45);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+    runFrame();
+  }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2, type: 'spring', stiffness: 100 }
-    }
-  };
+  // Randomized, organic interval (never robotic)
+  useEffect(() => {
+    let timeoutId;
 
-  const itemVariants = {
-    hidden: { y: 50, opacity: 0, filter: 'blur(20px)' },
-    visible: {
-      y: 0,
-      opacity: 1,
-      filter: 'blur(0px)',
-      transition: { type: 'spring', stiffness: 80, damping: 12 }
-    }
-  };
+    const scheduleNext = () => {
+      const delay = 3500 + Math.random() * 4000;
+      timeoutId = setTimeout(() => {
+        triggerGlitch();
+        // 35% chance of a realistic follow-up micro-stutter
+        if (Math.random() < 0.35) {
+          setTimeout(triggerGlitch, 380);
+        }
+        scheduleNext();
+      }, delay);
+    };
+
+    scheduleNext();
+    return () => clearTimeout(timeoutId);
+  }, [triggerGlitch]);
+
+  const { active, first, last, faultCode, sliceTop, sliceBottom, offsetX } = glitchState;
 
   return (
-    <section className="relative min-h-dvh flex items-center justify-center overflow-hidden px-6 bg-transparent" style={{ perspective: 1000 }}>
-      
-      {/* DYNAMIC BACKGROUND: Cybernetic HUD Rings with Parallax */}
-      <motion.div
-        style={{ x: ring1X, y: ring1Y, originX: 0.5, originY: 0.5 }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        className="absolute top-1/2 left-1/2 w-[120vw] md:w-[80vw] h-[120vw] md:h-[80vw] border-[1px] border-[#66FCF1]/20 border-dashed rounded-full -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none opacity-50"
-      />
-      <motion.div
-        style={{ x: ring2X, y: ring2Y, originX: 0.5, originY: 0.5 }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-        className="absolute top-1/2 left-1/2 w-[90vw] md:w-[60vw] h-[90vw] md:h-[60vw] border-[2px] border-[#45A29E]/15 border-dotted rounded-full -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none opacity-40"
-      />
-
-      {/* BACKGROUND: Vertical Laser Scans (Accelerated) */}
-      <div className="absolute inset-0 flex justify-between px-[10%] opacity-30 pointer-events-none z-0">
-        {[1, 2, 3].map((i) => (
-          <motion.div 
-            key={i}
-            animate={{ y: ["-100%", "100%"] }} 
-            transition={{ duration: 4 + i, repeat: Infinity, ease: "linear", delay: i * 0.5 }} 
-            className="w-[1px] h-full bg-gradient-to-b from-transparent via-[#66FCF1] to-transparent" 
+    <section
+      ref={heroRef}
+      className="relative min-h-dvh w-full flex flex-col justify-between bg-[#050505] text-[#F4F4F0] border-b border-white/10 select-none overflow-hidden"
+    >
+      {/* Real Horizontal Tear Bars during active fault */}
+      {active && (
+        <>
+          <div
+            style={{ top: `${sliceTop}%` }}
+            className="absolute left-0 right-0 h-[2px] bg-[#FF2A2A] shadow-[0_0_10px_#FF2A2A] z-40 pointer-events-none"
           />
-        ))}
+          <div
+            style={{ top: `${Math.min(92, sliceTop + 18)}%` }}
+            className="absolute left-0 right-0 h-[1px] bg-[#D4FF00]/80 z-40 pointer-events-none"
+          />
+        </>
+      )}
+
+      {/* Top Architectural Status Bar */}
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full grid grid-cols-2 md:grid-cols-4 border-b border-white/10 text-xs font-mono uppercase tracking-widest"
+      >
+        <div className="p-5 md:p-6 border-r border-white/10 flex items-center gap-3 overflow-hidden">
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              active ? 'bg-[#FF2A2A] animate-ping' : 'bg-[#D4FF00] animate-pulse'
+            }`}
+          />
+          <span className={`truncate ${active ? 'text-[#FF2A2A] font-bold' : 'text-[#F4F4F0]'}`}>
+            {active ? faultCode : 'Available / 2026'}
+          </span>
+        </div>
+
+        <div className="p-5 md:p-6 md:border-r border-white/10 text-right md:text-left text-neutral-400 tabular-nums">
+          {active ? 'AMD, IN — --:--:-- ERR' : `AMD, IN — ${time} IST`}
+        </div>
+
+        <div className="hidden md:block p-6 border-r border-white/10 text-neutral-400">
+          Full-Stack &amp; AI Systems
+        </div>
+
+        <a
+          href="/resume.pdf"
+          download
+          className="hidden md:flex p-6 items-center justify-between relative overflow-hidden group font-bold"
+        >
+          <span className="absolute inset-0 bg-[#D4FF00] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <span className="relative z-10 group-hover:text-black transition-colors">Download CV</span>
+          <span className="relative z-10 group-hover:text-black group-hover:translate-y-0.5 transition-all">↓</span>
+        </a>
+      </motion.header>
+
+      {/* Center: Massive Kinetic Typography with Real Sliced RGB Tear */}
+      <motion.div
+        style={{ opacity: heroOpacity }}
+        onMouseEnter={triggerGlitch}
+        className="flex-1 flex flex-col justify-center px-6 md:px-12 py-12 overflow-hidden"
+      >
+        {/* FIRST NAME */}
+        <div className="overflow-hidden relative">
+          <motion.h1
+            style={{ x: xLeft }}
+            initial={{ y: '105%' }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[15vw] md:text-[13vw] font-black uppercase leading-[0.82] tracking-tighter text-[#F4F4F0] relative"
+          >
+            {first}
+
+            {/* Sliced Red Error Tear Layer */}
+            {active && (
+              <span
+                aria-hidden="true"
+                style={{
+                  clipPath: `inset(${sliceTop}% 0 ${sliceBottom}% 0)`,
+                  transform: `translateX(${offsetX}px)`,
+                }}
+                className="absolute inset-0 text-[#FF2A2A] pointer-events-none select-none"
+              >
+                {first}
+              </span>
+            )}
+
+            {/* Opposite Acid-Lime Sync Offset Layer */}
+            {active && (
+              <span
+                aria-hidden="true"
+                style={{
+                  clipPath: `inset(${Math.max(0, 100 - sliceBottom)}% 0 0% 0)`,
+                  transform: `translateX(${-offsetX * 0.6}px)`,
+                }}
+                className="absolute inset-0 text-[#D4FF00] opacity-80 pointer-events-none select-none"
+              >
+                {first}
+              </span>
+            )}
+          </motion.h1>
+        </div>
+
+        {/* LAST NAME + ROLE */}
+        <div className="overflow-hidden flex items-baseline gap-4 md:gap-8 relative">
+          <motion.h1
+            style={{ x: xRight }}
+            initial={{ y: '105%' }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.95, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[15vw] md:text-[13vw] font-black uppercase leading-[0.82] tracking-tighter text-transparent [-webkit-text-stroke:1px_rgba(244,244,240,0.4)] hover:text-[#D4FF00] hover:[-webkit-text-stroke:0px] transition-all duration-200 relative"
+          >
+            {last}
+
+            {active && (
+              <span
+                aria-hidden="true"
+                style={{
+                  clipPath: `inset(${sliceTop}% 0 ${sliceBottom}% 0)`,
+                  transform: `translateX(${-offsetX}px)`,
+                }}
+                className="absolute inset-0 text-[#FF2A2A] [-webkit-text-stroke:0px] pointer-events-none select-none"
+              >
+                {last}
+              </span>
+            )}
+          </motion.h1>
+
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.55, duration: 0.6 }}
+            className={`hidden lg:inline-block text-sm font-mono uppercase tracking-widest max-w-xs leading-relaxed transition-colors ${
+              active ? 'text-[#FF2A2A]' : 'text-[#D4FF00]'
+            }`}
+          >
+            // {active ? faultCode : portfolioData.hero.role}
+          </motion.span>
+        </div>
+      </motion.div>
+
+      {/* Kinetic Infinite Marquee Ticker */}
+      <div className="w-full border-t border-white/10 py-3 overflow-hidden flex bg-[#080808]">
+        <motion.div
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+          className="flex whitespace-nowrap gap-12 font-mono text-xs uppercase tracking-[0.25em] text-neutral-500"
+        >
+          {[...tickerItems, ...tickerItems].map((item, i) => (
+            <span key={i} className="flex items-center gap-12">
+              <span>{item}</span>
+              <span className={active ? 'text-[#FF2A2A]' : 'text-[#D4FF00]'}>✦</span>
+            </span>
+          ))}
+        </motion.div>
       </div>
 
-      {/* DYNAMIC UI: 3D Magnetic Glassmorphic Container */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ rotateX: cardRotateX, rotateY: cardRotateY, transformStyle: "preserve-3d" }}
-        className="relative z-10 max-w-5xl w-full backdrop-blur-xl bg-[#0B0C10]/60 border-t border-b border-[#66FCF1]/30 py-16 px-10 md:p-20 rounded-none md:rounded-3xl shadow-[0_0_80px_rgba(69,162,158,0.2)] pointer-events-auto group"
-      >
-        {/* Animated Sweep Lighting inside the card */}
-        <motion.div 
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#66FCF1]/5 to-transparent skew-x-12 pointer-events-none"
-        />
-
-        {/* Sci-Fi Corner Accents (Pulsing) */}
-        <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#66FCF1] hidden md:block" />
-        <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#66FCF1] hidden md:block" />
-
-        <motion.div style={{ transform: "translateZ(30px)" }}>
-          <motion.p variants={itemVariants} className="text-[#66FCF1] font-mono text-sm md:text-base tracking-widest uppercase mb-6 flex items-center gap-4">
-            <motion.span animate={{ width: [10, 40, 10] }} transition={{ duration: 3, repeat: Infinity }} className="h-[1px] bg-[#66FCF1] block"></motion.span>
-            {portfolioData.hero.greeting}
-          </motion.p>
-          
-          {/* Metallic Typography with Shimmer */}
-          <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl lg:text-[7rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-600 mb-2 tracking-tighter leading-tight relative">
-            {portfolioData.hero.name}.
-          </motion.h1>
-          
-          <motion.h2 variants={itemVariants} className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#45A29E] mb-10 tracking-tight">
-            {portfolioData.hero.role}.
-          </motion.h2>
-          
-          <motion.p variants={itemVariants} className="text-gray-400 max-w-2xl text-lg md:text-xl leading-relaxed mb-12 font-medium">
+      {/* Bottom Split Strip */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 border-t border-white/10">
+        <div className="md:col-span-8 p-6 md:p-8 md:border-r border-white/10 flex items-center">
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="text-neutral-400 text-base md:text-xl max-w-2xl font-light leading-relaxed"
+          >
             {portfolioData.hero.tagline}
           </motion.p>
+        </div>
 
-          {/* Upgraded Cyber Button with Hover Expansion */}
-          <motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0px 0px 40px rgba(102, 252, 241, 0.5)", backgroundColor: "rgba(102, 252, 241, 0.2)" }}
-            whileTap={{ scale: 0.95 }}
-            className="px-10 py-4 border border-[#66FCF1] text-[#66FCF1] font-mono font-bold tracking-widest uppercase transition-all duration-300 cursor-none relative overflow-hidden flex items-center gap-3 group"
-          >
-            <span className="relative z-10">Initialize Array</span>
-            <motion.div 
-              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} 
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-2 h-2 bg-[#66FCF1] rounded-full group-hover:bg-white relative z-10"
-            />
-            {/* Button internal swipe effect */}
-            <div className="absolute inset-0 bg-[#66FCF1] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-            <span className="absolute inset-0 z-10 flex items-center gap-3 px-10 py-4 opacity-0 group-hover:opacity-100 group-hover:text-[#0B0C10] transition-opacity duration-300 delay-100">
-              Initialize Array
-              <div className="w-2 h-2 bg-[#0B0C10] rounded-full"></div>
-            </span>
-          </motion.button>
-        </motion.div>
-      </motion.div>
+        <a
+          href="#projects"
+          className="md:col-span-4 p-6 md:p-8 flex items-center justify-between relative overflow-hidden group bg-[#D4FF00] text-black font-mono font-bold uppercase tracking-widest text-sm"
+        >
+          <span className="absolute inset-0 bg-[#F4F4F0] -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <span className="relative z-10">Explore Selected Work</span>
+          <span className="relative z-10 text-xl group-hover:translate-x-1 group-hover:translate-y-1 transition-transform">
+            ↘
+          </span>
+        </a>
+      </div>
     </section>
   );
 };

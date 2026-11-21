@@ -1,119 +1,82 @@
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 const navLinks = [
-  { name: 'Home', href: '#home' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Arsenal', href: '#expertise' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Index', href: '#home', id: 'home' },
+  { name: 'Work', href: '#projects', id: 'projects' },
+  { name: 'About', href: '#about', id: 'about' },
+  { name: 'Stack', href: '#expertise', id: 'expertise' },
+  { name: 'History', href: '#experience', id: 'experience' },
+  { name: 'Contact', href: '#contact', id: 'contact' },
 ];
 
 const Navbar = () => {
-  const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious();
-    if (latest > previous && latest > 150 && !mobileMenuOpen) {
-      setHidden(true);
-    } else {
-      setHidden(false);
-    }
-    setScrolled(latest > 50);
-  });
-
-  const handleScroll = (e, href) => {
-    e.preventDefault();
-    setMobileMenuOpen(false); 
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const [activeId, setActiveId] = useState('home');
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
-    if (mobileMenuOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'auto';
-  }, [mobileMenuOpen]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: '-40% 0px -40% 0px' }
+    );
+
+    navLinks.forEach((link) => {
+      const el = document.getElementById(link.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleScroll = (e, href, id) => {
+    e.preventDefault();
+    setActiveId(id);
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
+      {/* Global Top Scroll Progress Hairline */}
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[2px] bg-[#D4FF00] origin-left z-[80] pointer-events-none"
+      />
+
+      {/* Bottom Floating Command Dock */}
       <motion.nav
-        variants={{
-          visible: { y: 0, opacity: 1 },
-          hidden: { y: "-100%", opacity: 0 }
-        }}
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 z-[60] flex justify-between md:justify-center items-center pt-6 px-6 md:px-0 pointer-events-none"
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/15 p-1.5 flex items-center gap-1 shadow-2xl max-w-[95vw] overflow-x-auto"
       >
-        <motion.div 
-          animate={{
-            backgroundColor: scrolled || mobileMenuOpen ? "rgba(31, 40, 51, 0.7)" : "rgba(11, 12, 16, 0)",
-            backdropFilter: scrolled || mobileMenuOpen ? "blur(20px)" : "blur(0px)",
-            border: scrolled || mobileMenuOpen ? "1px solid rgba(102, 252, 241, 0.2)" : "1px solid rgba(102, 252, 241, 0)",
-            boxShadow: scrolled || mobileMenuOpen ? "0 10px 30px -10px rgba(0, 0, 0, 0.5)" : "none"
-          }}
-          className="flex items-center justify-between w-full md:w-auto px-8 py-4 rounded-2xl md:rounded-full pointer-events-auto transition-colors"
-        >
-          <div className="md:hidden font-black text-white tracking-widest text-xl">
-            VS<span className="text-[#66FCF1]">.</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-10">
-            {navLinks.map((link, i) => (
-              <a
-                key={i}
-                href={link.href}
-                onClick={(e) => handleScroll(e, link.href)}
-                className="text-gray-300 hover:text-[#66FCF1] font-mono text-sm tracking-widest uppercase transition-colors px-2 py-1 cursor-none relative group"
-              >
-                {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#66FCF1] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            ))}
-          </div>
-
-          <button 
-            className="md:hidden text-white hover:text-[#66FCF1] transition-colors cursor-none"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </motion.div>
+        {navLinks.map((link) => {
+          const isActive = activeId === link.id;
+          return (
+            <a
+              key={link.id}
+              href={link.href}
+              onClick={(e) => handleScroll(e, link.href, link.id)}
+              className={`relative px-3 md:px-4 py-2 text-[11px] md:text-xs font-mono uppercase tracking-widest transition-colors duration-200 whitespace-nowrap ${
+                isActive ? 'text-black font-bold' : 'text-neutral-400 hover:text-[#F4F4F0]'
+              }`}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="activeDock"
+                  transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                  className="absolute inset-0 bg-[#D4FF00] -z-10"
+                />
+              )}
+              {link.name}
+            </a>
+          );
+        })}
       </motion.nav>
-
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="fixed inset-0 z-[55] bg-[#0B0C10]/95 backdrop-blur-2xl flex flex-col items-center justify-center pointer-events-auto md:hidden border-b border-[#66FCF1]/20"
-          >
-            <div className="flex flex-col items-center gap-10">
-              {navLinks.map((link, i) => (
-                <motion.a
-                  key={i}
-                  href={link.href}
-                  onClick={(e) => handleScroll(e, link.href)}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-3xl font-black text-white hover:text-[#66FCF1] uppercase tracking-widest cursor-none"
-                >
-                  {link.name}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

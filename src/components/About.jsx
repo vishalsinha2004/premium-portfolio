@@ -1,109 +1,126 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import profileImg from '../assets/hero.png';
+import GlitchText from './GlitchText';
 
 const About = () => {
-  // 3D Magnetic Hover Physics for the Bio Card
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const smoothX = useSpring(x, { damping: 20, stiffness: 150 });
-  const smoothY = useSpring(y, { damping: 20, stiffness: 150 });
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], ["5deg", "-5deg"]);
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], ["-5deg", "5deg"]);
+  const imageBoxRef = useRef(null);
+  const [imgGlitch, setImgGlitch] = useState(false);
 
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
+  const { scrollYProgress } = useScroll({
+    target: imageBoxRef,
+    offset: ['start end', 'end start'],
+  });
+  const imgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
 
   return (
-    <section className="relative py-32 px-6 md:px-24 flex flex-col md:flex-row items-center justify-between gap-16 overflow-hidden bg-transparent perspective-[1000px]">
-      
-      {/* 3D Glowing Image Container */}
-      <motion.div 
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, type: "spring" }}
-        className="relative w-full md:w-5/12 flex justify-center"
-      >
-        <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full p-2 bg-gradient-to-tr from-[#66FCF1] to-[#45A29E] shadow-[0_0_60px_rgba(102,252,241,0.2)] group cursor-none">
-          <div className="w-full h-full rounded-full bg-[#0B0C10] overflow-hidden border-4 border-[#0B0C10] relative">
-            <motion.div 
-              animate={{ rotate: 360 }} 
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-4 border border-[#66FCF1]/30 border-dashed rounded-full"
+    <section className="w-full bg-[#050505] text-[#F4F4F0] border-b border-white/10">
+      <div className="px-6 md:px-12 py-12 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="overflow-hidden">
+          <span className="font-mono text-xs uppercase tracking-widest text-[#FF2A2A] block mb-2">
+            (02) // USER_DUMP_PROFILE
+          </span>
+          <motion.h2
+            initial={{ y: '100%' }}
+            whileInView={{ y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-none"
+          >
+            <GlitchText text="THE ARCHITECT" />
+          </motion.h2>
+        </div>
+        <p className="font-mono text-xs uppercase tracking-widest text-neutral-500">
+          BCA — Shreyarth University
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12">
+        {/* Left Column: Corrupted Signal Portrait */}
+        <div
+          ref={imageBoxRef}
+          className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-white/10 p-6 md:p-12 flex flex-col justify-between gap-6"
+        >
+          <div
+            onMouseEnter={() => setImgGlitch(true)}
+            onMouseLeave={() => setImgGlitch(false)}
+            className="relative aspect-[4/5] w-full overflow-hidden border border-white/10 bg-[#0A0A0A] group"
+          >
+            <motion.img
+              style={{ y: imgY, scale: 1.15 }}
+              src={profileImg}
+              alt="Vishal Sinha"
+              className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
             />
-            <div className="w-full h-full bg-[#0B0C10]/50 flex items-center justify-center text-[#66FCF1] font-mono text-sm relative z-10">
-              <img src={profileImg} alt="Vishal Sinha" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 hover:scale-110" />
+
+            {/* Red Fault Tear Slice on Hover */}
+            {imgGlitch && (
+              <>
+                <img
+                  src={profileImg}
+                  alt=""
+                  aria-hidden="true"
+                  style={{ clipPath: 'inset(28% 0 52% 0)', transform: 'translateX(10px)' }}
+                  className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-75 pointer-events-none"
+                />
+                <div className="absolute top-[28%] left-0 right-0 h-[2px] bg-[#FF2A2A] z-20 pointer-events-none" />
+              </>
+            )}
+
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-[#050505]/95 border-t border-white/10 flex justify-between font-mono text-xs uppercase tracking-widest z-20">
+              <span className={imgGlitch ? 'text-[#FF2A2A] font-bold' : 'text-[#D4FF00]'}>
+                {imgGlitch ? 'ERR // FRAME_TEAR' : 'IMG_01 // OK'}
+              </span>
+              <span className="text-neutral-400">Ahmedabad, IN</span>
             </div>
           </div>
         </div>
-      </motion.div>
 
-      {/* Biography Text & 3D Magnetic Card */}
-      <div className="w-full md:w-7/12">
-        <motion.h2 
-          initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-8 tracking-tighter"
-        >
-          The <span className="text-[#66FCF1]">Architect.</span>
-        </motion.h2>
-        
-        <motion.div 
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          className="relative bg-[#1F2833]/40 backdrop-blur-xl border border-[#66FCF1]/20 p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] group overflow-hidden"
-        >
-          {/* Internal Light Sweep */}
-          <motion.div 
-            animate={{ x: ["-100%", "200%"] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#66FCF1]/5 to-transparent skew-x-12 pointer-events-none"
-          />
+        {/* Right Column: Editorial Bio & Action Strip */}
+        <div className="lg:col-span-7 flex flex-col justify-between">
+          <div className="p-6 md:p-12 lg:p-16 flex-1 flex flex-col justify-center">
+            <motion.p
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-2xl md:text-4xl font-bold tracking-tight leading-snug text-[#F4F4F0] mb-8"
+            >
+              Full-stack developer specializing in Python, Django, and React.js—engineering scalable web platforms, multi-modal transport aggregators, and RAG-based AI tools.
+            </motion.p>
 
-          <div style={{ transform: "translateZ(30px)" }}>
-            <p className="text-gray-300 text-lg leading-relaxed mb-6 font-medium">
-              I am a full-stack developer specializing in Python, Django, and React.js. My academic foundation—a Bachelor of Computer Applications from Shreyarth University—combined with deep hands-on experience building multi-modal transport aggregators and RAG-based AI tools, allows me to engineer robust, scalable applications.
-            </p>
-            <p className="text-gray-400 text-base leading-relaxed mb-8">
-              My development philosophy centers on merging heavy, immersive front-end graphics with clean, high-performance back-end logic to create experiences that users want to return to again and again.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <motion.a
-                href="https://github.com/vishalsinha2004"
-                target="_blank"
-                rel="noreferrer"
-                whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(102, 252, 241, 0.3)" }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-[#66FCF1]/10 border border-[#66FCF1] text-[#66FCF1] rounded-lg font-bold tracking-widest uppercase transition-all hover:bg-[#66FCF1] hover:text-[#0B0C10] cursor-none"
-              >
-                GitHub Registry
-              </motion.a>
-              <motion.a
-                href="/resume.pdf"
-                download
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-transparent border-2 border-white/20 text-white rounded-lg font-bold tracking-widest uppercase transition-all hover:border-white cursor-none"
-              >
-                Download CV
-              </motion.a>
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-neutral-400 text-base md:text-lg leading-relaxed max-w-2xl"
+            >
+              My development philosophy centers on merging high-contrast, responsive front-end systems with clean, high-performance back-end logic to build products that hold up under real-world load.
+            </motion.p>
           </div>
-        </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-t border-white/10 font-mono text-xs uppercase tracking-widest font-bold">
+            <a
+              href="https://github.com/vishalsinha2004"
+              target="_blank"
+              rel="noreferrer"
+              className="relative overflow-hidden group p-6 md:p-8 border-b sm:border-b-0 sm:border-r border-white/10 flex items-center justify-between"
+            >
+              <span className="absolute inset-0 bg-[#D4FF00] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+              <span className="relative z-10 group-hover:text-black transition-colors">GitHub_Registry</span>
+              <span className="relative z-10 text-lg group-hover:text-black">↗</span>
+            </a>
+            <a
+              href="/resume.pdf"
+              download
+              className="relative overflow-hidden group p-6 md:p-8 flex items-center justify-between"
+            >
+              <span className="absolute inset-0 bg-[#FF2A2A] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+              <span className="relative z-10 group-hover:text-black transition-colors">Extract_CV.pdf</span>
+              <span className="relative z-10 text-lg group-hover:text-black">↓</span>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

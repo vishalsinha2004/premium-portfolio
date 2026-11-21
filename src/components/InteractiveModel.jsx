@@ -1,28 +1,41 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { MeshDistortMaterial, Sphere, Float } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 
 export default function InteractiveModel() {
-  const meshRef = useRef();
+  const groupRef = useRef();
 
-  // Rotates the 3D model continuously
   useFrame(({ clock }) => {
-    meshRef.current.rotation.x = clock.getElapsedTime() * 0.2;
-    meshRef.current.rotation.y = clock.getElapsedTime() * 0.3;
+    if (!groupRef.current) return;
+    groupRef.current.rotation.x = clock.getElapsedTime() * 0.18;
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.25;
   });
 
   return (
-    <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
-      <Sphere ref={meshRef} args={[1, 100, 100]} scale={2.2}>
-        <MeshDistortMaterial 
-          color="#66FCF1" 
-          attach="material" 
-          distort={0.5} 
-          speed={2} 
-          roughness={0.1} 
-          metalness={0.9} 
-        />
-      </Sphere>
+    <Float speed={2} rotationIntensity={1} floatIntensity={1.2}>
+      <group ref={groupRef} scale={2}>
+        {/* Solid Matte Obsidian Core */}
+        <mesh>
+          <icosahedronGeometry args={[1, 1]} />
+          <meshStandardMaterial
+            color="#0A0A0A"
+            roughness={0.3}
+            metalness={0.8}
+            flatShading={true}
+          />
+        </mesh>
+
+        {/* Acid Lime Architectural Wireframe */}
+        <mesh scale={1.02}>
+          <icosahedronGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            color="#D4FF00"
+            wireframe={true}
+            transparent={true}
+            opacity={0.35}
+          />
+        </mesh>
+      </group>
     </Float>
   );
 }
